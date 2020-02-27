@@ -14,9 +14,6 @@ public class PublicationForPurchaseService {
     @Autowired
     private PublicationForPurchaseRepository pubForRurRepository;
 
-    @Autowired
-    private PublicationService publicationService;
-
 
     public Boolean save(PublicationForPurchase forPurchase) {
         Boolean audit = pubForRurRepository.existsByPublicationIdAndCart(forPurchase.getPublication().getId(), forPurchase.getCart());

@@ -11,8 +11,5 @@ import java.time.LocalDateTime;
 
 @Repository
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
-//    Purchase findByUserLogin(String login);
-//    Purchase findByUserLoginAndCreationDate(String login, LocalDateTime dateTime);
-//    Purchase findByPublicationsForPurchaseContains(PublicationForPurchase publicationForPurchase);
     Page<Purchase> findAllByUserLogin(String login, Pageable pageable);
 }

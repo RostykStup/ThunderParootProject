@@ -13,22 +13,22 @@ public class CartController {
     @Autowired
     private CartService cartService;
 
-    @GetMapping()
+    @GetMapping
     public CartResponse getCart(){
          return cartService.getCart();
     }
 
-    @PostMapping()
+    @PostMapping
     public Boolean addToCart(@RequestBody CartRequest cartRequest){
         return cartService.addToCart(cartRequest);
     }
 
-    @PutMapping()
+    @PutMapping
     public void updateCart(Long id, @RequestBody CartRequest cartRequest){
         cartService.updateCart(id, cartRequest);
     }
 
-    @DeleteMapping()
+    @DeleteMapping
     public void deleteFromCart(Long id){
         cartService.deleteFromCart(id);
     }

@@ -17,6 +17,17 @@
     justify-content: space-between;
 }
 
+#container{
+    height: 100%;
+    width: 100%;
+
+}
+
+#content-container{
+    margin: 0 auto;
+    width: 50%;
+}
+
 #profile-info{
     width: 70%;
     height: 40%;
@@ -33,14 +44,15 @@
     color: #000000;
 }
 
+#user-avatar-image{
+    max-width: 100px;
+    border-radius: 50%;
+}
+
 #user-phone-container{
     width: 100%;
     font-size: 20px;
     color: #000000;
-}
-
-#user-avatar-image{
-    height: 200px;
 }
 
 .user-info-input[disabled]{

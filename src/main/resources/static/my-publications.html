@@ -365,8 +365,8 @@
             let subcategoryId = $btn.parent().parent().children().children().children().filter($('.subcategory-id')).val();
             let deliveryId = $btn.parent().parent().children().children().children().filter($('.delivery-id')).val();
             let typeId = $btn.parent().parent().children().children().children().filter($('.type-id')).val();
-            if ($btn.prev().prop('disabled')) {
 
+            if ($btn.prev().prop('disabled')) {
                 $btn.parent().parent().children($('.item-input')).children($('.item-input')).filter($('.item-input')).removeAttr("disabled");
                 $btn.parent().parent().children($('.item-input')).children($('.item-input')).children($('.item-input')).filter($('.item-input')).removeAttr("disabled");
 
@@ -383,8 +383,7 @@
                 $btn.html('Save');
 
             } else {
-                console.log(isNumber($countInput[0].value));
-                console.log(isNumber($priceInput[0].value));
+
                 if (isNumber($countInput[0].value) && isNumber($priceInput[0].value)) {
                     let request = {
                         name: $nameInput.val(),

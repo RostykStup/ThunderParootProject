@@ -31,7 +31,7 @@ public class HtmlPagesController {
 
     @RequestMapping("subcategory-admin")
     public String subcategory(){
-        return "index_subcategory.html";
+        return "test/index_subcategory.html";
     }
 
     @RequestMapping("publication-page")

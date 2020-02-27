@@ -12,13 +12,11 @@ import rostyk.stupnytskiy.zepka.dto.response.PublicationsWithRandomCategoryRespo
 import rostyk.stupnytskiy.zepka.entity.Publication;
 import rostyk.stupnytskiy.zepka.repository.PublicationRepository;
 import rostyk.stupnytskiy.zepka.specification.PublicationSpecification;
-import rostyk.stupnytskiy.zepka.specification.SearchSpecification;
 import rostyk.stupnytskiy.zepka.tools.FileTool;
 import rostyk.stupnytskiy.zepka.tools.MatchFinderTool;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,7 +71,7 @@ public class PublicationService {
         final Page<Publication> page = publicationRepository.findAll(new PublicationSpecification(request), request.getPaginationRequest().mapToPageable());
         return new PageResponse<>(page.get()
                 .map(e -> new PublicationForSearchResponse(new PublicationResponse(e), matchFinder.findMatchPointsFromPublication(request.getName(), e)))
-                .filter(e -> e.getMatchPoints() >= 100)
+                .filter(e -> e.getMatchPoints() > 100)
                 .filter(e -> e.getResponse().getNumber() > 0)
                 .collect(Collectors.toList()),
                 page.getTotalElements(),

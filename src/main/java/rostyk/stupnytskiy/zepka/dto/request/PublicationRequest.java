@@ -16,13 +16,16 @@ public class PublicationRequest {
     @NotNull
     @NotBlank
     private String name;
+
     @NotNull
     @Min(0)
     private Double price;
 
+    @NotBlank
     private String description;
 
     @NotNull
+    @NotBlank
     private Long subcategoryId;
 
     @Min(1)

@@ -33,18 +33,6 @@ $(document).ready(() => {
     makeFiltrationRequest();
 });
 
-document.getElementById('min-price-input').addEventListener('mousemove', () => {
-    document.getElementById('test-min').value = document.getElementById('min-price-input').value;
-    document.getElementById('max-price-input').setAttribute('min', `${document.getElementById('min-price-input').value}`);
-});
-
-document.getElementById('max-price-input').addEventListener('mousemove', () => {
-    document.getElementById('test-max').value = document.getElementById('max-price-input').value;
-    document.getElementById('min-price-input').setAttribute('max', `${document.getElementById('max-price-input').value}`);
-});
-
-
-
 let appendPublicationsToContainer = (publication) =>{
     // console.log(publication.imageName);
     let link = publication.imageName ? `http://localhost:8080/image/${publication.imageName}` : "https://novi-vorota.com.ua/catalog/view/theme/novivorota/images/notfound.png";

@@ -22,12 +22,12 @@ public class ImageController {
         publicationService.updateImage(id,imageName);
     }
 
-    @PutMapping()
+    @PutMapping
     public void addImage(Long id,  @RequestBody AddImageRequest request) throws IOException {
         publicationService.addImage(id,request);
     }
 
-    @DeleteMapping()
+    @DeleteMapping
     public void deleteImage(Long id, String imageName){
         publicationService.deleteImage(id,imageName);
     }

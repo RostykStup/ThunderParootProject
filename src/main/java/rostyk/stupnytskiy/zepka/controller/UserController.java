@@ -20,8 +20,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private PurchaseService purchaseService;
 
     @Autowired
     private AddressService addressService;

@@ -11,36 +11,36 @@ public class MatchFinderTool {
         if (request != null) {
             return findMatchPointsFromName(request, p.getName())
                     + findMatchPointsFromDescription(request, p.getDescription())
-                    + findMatchPointsFromName(request,p.getSubcategory().getName())
-                    + findMatchPointsFromName(request,p.getSubcategory().getCategory().getName());
+                    + findMatchPointsFromName(request, p.getSubcategory().getName())
+                    + findMatchPointsFromName(request, p.getSubcategory().getCategory().getName());
         } else return 100;
     }
 
-    public static Integer findMatchPointsFromName(String request, String name) {
+    static Integer findMatchPointsFromName(String request, String name) {
         Integer points = 0;
         String[] requestArr = request.toLowerCase().split(" ");
         String[] nameArr = name.toLowerCase().split(" ");
 
-        for (String req : requestArr){
+        for (String req : requestArr) {
             for (String nam : nameArr) {
-                if (req.equals(nam)) points+=1000;
+                if (req.equals(nam)) points += 1000;
                 else {
-                    if(nam.contains(req) || req.contains(nam)) points+=100;
+                    if (nam.contains(req) || req.contains(nam)) points += 100;
                 }
             }
         }
         return points;
     }
 
-    public static Integer findMatchPointsFromDescription(String request, String description) {
+    static Integer findMatchPointsFromDescription(String request, String description) {
         Integer points = 0;
         String[] requestArr = request.toLowerCase().split(" ");
         String[] nameArr = description.toLowerCase().split(" ");
-        for (String req : requestArr){
+        for (String req : requestArr) {
             for (String nam : nameArr) {
-                if (req.equals(nam)) points+=100;
+                if (req.equals(nam)) points += 100;
                 else {
-                    if(nam.contains(req) || req.contains(nam)) points+=10;
+                    if (nam.contains(req) || req.contains(nam)) points += 10;
                 }
             }
         }

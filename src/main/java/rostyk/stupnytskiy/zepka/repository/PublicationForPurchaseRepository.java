@@ -10,6 +10,5 @@ import java.util.Set;
 public interface PublicationForPurchaseRepository extends JpaRepository<PublicationForPurchase, Long> {
     Boolean existsByPublicationIdAndCart(Long id, Cart cart);
     PublicationForPurchase findByIdAndCart(Long id, Cart cart);
-    PublicationForPurchase findByPublicationIdAndCart(Long id, Cart cart);
-    Set<PublicationForPurchase> findAllByCart(Cart cart);
+
 }
