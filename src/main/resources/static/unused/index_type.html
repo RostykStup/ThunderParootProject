@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Type_Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
+<body>
+
+<!--<a class="waves-effect waves-light btn modal-trigger" href="#modal1">Modal</a>-->
+<button data-target="modal1" class="btn modal-trigger">Create</button>
+<div id="modal1" class="modal">
+    <div class="modal-content">
+        <input type="text" id="type-name" placeholder="Name">
+        <input type="text" id="type-id" style="display: none">
+        <button id="type-create-button" class="btn" >Create</button>
+        <button id="close-button" class = "btn" >Cancel</button>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        $('.modal').modal();
+    });
+    $('#type-create-button').click(() => {
+        let id = $('#type-id').val();
+        if(id === ''){
+            let request = {
+                name: $('#type-name').val()
+            }
+            $.ajax({
+                url: 'http://localhost:8080/type',
+                contentType: 'application/json',
+                type: 'post',
+                data: JSON.stringify(request),
+                success: function (response) {
+                    console.log('post', response);
+                    $('.modal').modal('close');
+                    $('#type-name').val('');
+                    location.reload();
+                    // redrawTable();
+                }
+            });
+        } else {
+            let request = {
+                id:$('#type-id').val(),
+                name: $('#type-name').val()
+            }
+            $.ajax({
+                url: 'http://localhost:8080/type?id='+id,
+                contentType: 'application/json',
+                type: 'put',
+                data: JSON.stringify(request),
+                success: function (response) {
+                    console.log('update', response);
+                    $('.modal').modal('close');
+                    $('#type-name').val('');
+                    $('#type-id').val('');
+                    location.reload();
+                    // redrawTable();
+                }
+            });
+
+        }
+    });
+
+    $('#close-button').click(() => {
+        $('.modal').modal('close');
+        $('#type-name').val('');
+        $('#type-id').val('');
+    });
+
+</script>
+
+<table id="types_table">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody id="types">
+
+    </tbody>
+</table>
+
+<script>
+    redrawTable();
+    function redrawTable() {
+        $("#types tr").remove();
+        $.ajax({
+            url: 'http://localhost:8080/type',
+            type: 'get',
+            success: function (response) {
+                for (let type of response) {
+                    appendCountryToTable(type);
+                }
+                actionsOnDeleteButton();
+                actionsOnUpdateButton()
+            }
+
+        })
+    }
+    function appendCountryToTable(type) {
+        $('#types').append(`
+            <tr>
+             <td class="type-id-col">${type.id}</td>
+             <td class="type-name-col">${type.name}</td>
+                 <td>
+                  <button value="${type.id}" class="delete-btn btn">Delete
+                  </button>
+                 <button value="${type.id}" class="update-btn btn">Update
+                 </button>
+                  </td>
+             </tr>
+        `);
+    };
+
+    function actionsOnDeleteButton() {
+        $('.delete-btn').click((e) =>{
+            let id = e.target.value;
+            $.ajax({
+                url: 'http://localhost:8080/type?id='+id,
+                type: 'delete',
+                success: function () {
+                    console.log('deleted');
+                    location.reload();
+                    // redrawTable();
+                }
+            })
+        });
+    };
+
+    function actionsOnUpdateButton() {
+        $('.update-btn').click((e) =>{
+            let id = e.target.value;
+            let $btn = $(e.target);
+            $('#type-name').val($btn.parent().siblings('.type-name-col').html());
+            $('#type-id').val(id);
+            $('.modal').modal('open');
+        });
+    };
+</script>
+</body>
+</html>

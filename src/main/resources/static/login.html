@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/navStyle.css">
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+</head>
+<body>
+<nav class="navigation">
+    <ul class="navigation-list">
+        <li class="navigation-item">
+            <a class="navigation-link" href="main-page.html">
+                <i class='fas fa-crow' style='font-size:30px;color:white'></i>
+            </a>
+        </li>
+        <li class="navigation-item" style="margin-left: 10px">
+            <div id="search-div"><i class="fa fa-search"></i><input class="search-input" id="search-input" type="text" placeholder="What are you looking for?"></div>
+        </li>
+        <li class="navigation-item">
+            <a class="navigation-link" href="create-publication.html">Create publication</a>
+        </li>
+        <li class="navigation-item  has-sub-nav" id="nav-login-btn">
+            <a class="navigation-link" id="user-profile-info" href="#"></a>
+            <ul class="sub-navigation">
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-profile.html">My profile</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-orders.html">My orders</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-publications.html">My publications</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-purchases.html">My purchases</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="cart-page.html" id="nav-cart-href">My cart</a>
+                </li>
+                <li class="sub-navigation-item" id="log-out-btn">
+                    <a class="sub-navigation-link" href="#">Log out</a>
+                </li>
+            </ul>
+        </li>
+        <li id="nav-cart-btn" class="navigation-item">
+            <a class="navigation-link" href="cart-page.html"><i class="fa">&#xf07a;</i></a>
+        </li>
+    </ul>
+</nav>
+<input type="text" id="login-input" placeholder="login">
+<input type="text" id="password-input" placeholder="password">
+<button id="login-button">Log in</button>
+<a href="registration.html">I haven`t account</a>
+</body>
+<script>
+    const API_URL = 'http://localhost:8080';
+    const $loginBtn = $('#login-button');
+    const $loginInput = $('#login-input');
+    const $passwordInput = $('#password-input');
+
+    $loginBtn.click(() => {
+       let login =  $loginInput.val();
+       let password =  $passwordInput.val();
+       let request = {
+           login: login,
+           password: password
+       };
+        $.ajax({
+            url: `${API_URL}/user/login`,
+            contentType: 'application/json',
+            type: 'post',
+            data: JSON.stringify(request),
+            success: function (response) {
+                console.log('ok')
+                window.localStorage.setItem('userToken', response.token);
+                window.localStorage.setItem('username', response.username);
+                window.localStorage.setItem('userId', response.id);
+                window.location.href = 'main-page.html';
+            },
+        })
+    });
+</script>
+<script src="js/nav.js"></script>
+</html>

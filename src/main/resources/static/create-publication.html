@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Publication</title>
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="css/navStyle.css">
+<script src='https://kit.fontawesome.com/a076d05399.js'></script>
+<style>
+    .image-in-container{
+        height:100%;
+
+    }
+
+    .image-container{
+        height: 100px;
+        width: 100px;
+    }
+</style>
+<body>
+<nav class="navigation">
+    <ul class="navigation-list">
+        <li class="navigation-item">
+            <a class="navigation-link" href="main-page.html">
+                <i class='fas fa-crow' style='font-size:30px;color:white'></i>
+            </a>
+        </li>
+        <li class="navigation-item" style="margin-left: 10px">
+            <div id="search-div"><i class="fa fa-search"></i><input class="search-input" id="search-input" type="text" placeholder="What are you looking for?"></div>
+        </li>
+        <li class="navigation-item">
+            <a class="navigation-link" href="create-publication.html">Create publication</a>
+        </li>
+        <li class="navigation-item  has-sub-nav" id="nav-login-btn">
+            <a class="navigation-link" id="user-profile-info" href="#"></a>
+            <ul class="sub-navigation">
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-profile.html">My profile</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-orders.html">My orders</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-publications.html">My publications</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-purchases.html">My purchases</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="cart-page.html" id="nav-cart-href">My cart</a>
+                </li>
+                <li class="sub-navigation-item" id="log-out-btn">
+                    <a class="sub-navigation-link" href="#">Log out</a>
+                </li>
+            </ul>
+        </li>
+        <li id="nav-cart-btn" class="navigation-item">
+            <a class="navigation-link" href="cart-page.html"><i class="fa">&#xf07a;</i></a>
+        </li>
+    </ul>
+</nav>
+<div class="container">
+    <div id="container">
+        <div id="main-info-container">
+            <input id="publication-name-input" type="text" placeholder="Name">
+            <input id="publication-price-input" min="0" type="number" placeholder="Price">
+            <input id="publication-count-input" min="1" max="2000000000" type="number" placeholder="Number of product">
+            <textarea id="publication-description-input" type="text" cols="30" rows="10" style="resize: none"
+                      placeholder="Description"></textarea>
+        </div>
+        <div id="select-info-container">
+            <select id="category-select">
+                <option value="0" disabled selected>Category</option>
+            </select>
+            <select id="subcategory-select">
+                <option value="0" disabled selected>Subcategory</option>
+            </select>
+            <select id="type-select">
+                <option value="0" disabled selected>Type</option>
+            </select>
+            <select id="delivery-select">
+                <option value="0" disabled selected>Delivery</option>
+            </select>
+        </div>
+        <div id="image-info-container">
+            <input id="publication-image-input" type="file" accept="image/*" multiple>
+            <div id="images-container">
+            </div>
+        </div>
+        <div id="create-button-container">
+            <button id="publication-create-button">Create</button>
+        </div>
+    </div>
+
+</div>
+</body>
+<script>
+    const API_URL = 'http://localhost:8080';
+    const categorySelect = $('#category-select');
+    const subcategorySelect = $('#subcategory-select');
+    const typeSelect = $('#type-select');
+    const deliverySelect = $('#delivery-select');
+    const creationButton = $('#publication-create-button');
+    const publicationNameInput = $('#publication-name-input');
+    const publicationCountInput = $('#publication-count-input');
+    const publicationPriceInput = $('#publication-price-input');
+    const publicationDescriptionInput = $('#publication-description-input');
+    const publicationImageInput = $('#publication-image-input');
+    let publicationMainImage;
+
+
+    $(document).ready(() => {
+        if (!window.localStorage.getItem('username')) {
+            window.location.href = 'login.html';
+        }
+    });
+
+
+    function readURL(input) {
+        for (let i = 0; i < 5; i++) {
+            if (input.files && input.files[i]) {
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#images-container').append(`
+                    <div class="image-container">
+                    <img class="image--${i} image-in-container" data-number="${i}" src="#"/>
+                    </div>
+                    `)
+                    $('.image--' + i).attr('src', e.target.result);
+                };
+                reader.readAsDataURL(input.files[i]);
+            }
+        }
+    }
+
+    publicationImageInput.change(function() {
+        $('#images-container').html('');
+        let length = publicationImageInput[0].files.length;
+        if (parseInt(length) > 5){
+            alert("You can only upload a maximum of 5 files");
+            publicationImageInput.val('');
+        } else readURL(this);
+
+    });
+
+
+    creationButton.click(() => {
+        const publicationImages = [];
+
+        let request = {
+            name: publicationNameInput.val(),
+            price: publicationPriceInput.val(),
+            description: publicationDescriptionInput.val(),
+            subcategoryId: subcategorySelect.val(),
+            deliveryId: deliverySelect.val(),
+            typeId: typeSelect.val(),
+            count: publicationCountInput.val()
+
+        };
+        $('.image-in-container').each((i,e) => {
+            getBase64FromFile(publicationImageInput[0].files[i])
+                .then(image => {
+                    publicationImages.push(image);
+                    if (i === (publicationImageInput[0].files.length - 1)) {
+                        request.images = publicationImages;
+                        $.ajax({
+                            url: `${API_URL}/publication`,
+                            contentType: 'application/json',
+                            headers: {
+                                "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                            },
+                            type: 'post',
+                            data: JSON.stringify(request),
+                            success: function () {
+                                console.log('ok');
+                                window.location.href = 'my-publications.html'
+                                publicationImageInput.val('');
+                                $('#images-container').html('');
+                                publicationDescriptionInput.val('');
+                                publicationPriceInput.val('');
+                                publicationNameInput.val('');
+                                categorySelect.val('0');
+                                subcategorySelect.val('0');
+                                deliverySelect.val('0');
+                                typeSelect.val('0');
+                            },
+                        })
+                    }
+                })
+                .catch(() => alert("Something went wrong, try again"))
+        });
+    });
+
+    $(document).ready(function () {
+        $.ajax({
+            url: `${API_URL}/category`,
+            type: 'get',
+            success: function (response) {
+                for (const category of response) {
+                    categorySelect.append(`<option value="${category.id}">${category.name}</option>`)
+                }
+            }
+        });
+        $.ajax({
+            url: `${API_URL}/type`,
+            type: 'get',
+            success: function (response) {
+                for (const type of response) {
+                    typeSelect.append(`<option value="${type.id}">${type.name}</option>`)
+                }
+            }
+        });
+        $.ajax({
+            url: `${API_URL}/delivery`,
+            type: 'get',
+            success: function (response) {
+                for (const delivery of response) {
+                    deliverySelect.append(`<option value="${delivery.id}">${delivery.name}</option>`)
+                }
+            }
+        });
+
+    });
+
+    categorySelect.change(function () {
+        const id = categorySelect.val();
+        subcategorySelect.find('option').remove();
+        $.ajax({
+            url: `${API_URL}/subcategory/category?id=${id}`,
+            type: 'get',
+            success: function (response) {
+                subcategorySelect.append(`<option value="0" disabled selected>Subcategory</option>`);
+                for (const subcategory of response) {
+                    subcategorySelect.append(`<option value="${subcategory.id}">${subcategory.name}</option>`);
+                }
+            }
+        });
+    });
+
+    const getBase64FromFile = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    };
+
+</script>
+<script src="js/nav.js"></script>
+</html>

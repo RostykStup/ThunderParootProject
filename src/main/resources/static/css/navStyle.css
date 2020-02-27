@@ -1,0 +1,166 @@
+body {
+    margin: 0;
+
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+    color: #333;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+
+/* Nav */
+
+.navigation {
+    /*position: fixed;*/
+    /*width: 100%;*/
+    background-color: #30bcfe;
+}
+
+.navigation-list {
+    display: flex;
+    justify-content: center;
+}
+
+.navigation-item.has-sub-nav,
+.sub-navigation-item.has-sub-nav {
+    position: relative;
+}
+
+.search{
+    visibility: visible;
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.navigation-item.has-sub-nav .navigation-link {
+    padding-right: 30px;
+}
+
+.navigation-item.has-sub-nav:after,
+.sub-navigation-item.has-sub-nav:after {
+    content: "";
+    display: block;
+    width: 8px;
+    height: 8px;
+
+    border-top: 1px solid #fff;
+    border-right: 1px solid #fff;
+
+    position: absolute;
+    top: 50%;
+    right: 10px;
+}
+
+.sub-navigation-item:hover{
+    background-color: #2884b3;
+}
+
+#main-img{
+    height: 40px;
+    padding: 0;
+    margin: 0;
+}
+
+.navigation-item.has-sub-nav:after {
+    transform: translateY(-50%) rotate(135deg);
+}
+
+.sub-navigation-item.has-sub-nav:after {
+    transform: translateY(-50%) rotate(45deg);
+}
+
+.navigation-item:hover > .sub-navigation,
+.sub-navigation-item:hover > .sub-navigation {
+    visibility: visible;
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.navigation-link {
+    display: block;
+    padding: 10px 20px;
+
+    color: #fff;
+    text-decoration: none;
+
+    transition: background .1s linear;
+}
+
+.navigation-link:hover {
+    background-color: #2884b3;
+}
+
+
+
+/* Subnav */
+
+.sub-navigation {
+    display: block;
+    min-width: 100%;
+    visibility: hidden;
+    opacity: 0;
+
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 10;
+
+    background-color: #30bcfe;
+    font-size: 14px;
+
+    transform: translateY(10px);
+    transition: visibility .2s linear, transform .2s linear;
+}
+
+.sub-navigation-item:not(:last-child) {
+    border-bottom: 1px solid #2187b4;
+}
+
+.sub-navigation-item > .sub-navigation {
+    left: 100%;
+    top: 0;
+}
+
+.sub-navigation-link {
+    display: block;
+    padding: 5px 10px;
+
+    color: #fff;
+    text-decoration: none;
+}
+
+
+.search-input{
+    height: 90%;
+    width: 400px;
+    border-radius: 5px;
+    padding: 3px;
+
+    border: none;
+    font-size: 17px;
+}
+
+.search-input:after{
+
+}
+
+#search-div{
+    /*display: flex;*/
+    /*justify-content: center;*/
+    margin-top: 5px;
+    height: 75%;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #ffffff;
+}

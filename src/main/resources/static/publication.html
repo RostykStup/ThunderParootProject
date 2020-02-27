@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Publication</title>
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="css/navStyle.css">
+<link rel="stylesheet" href="css/my-modal.css">
+<script src='https://kit.fontawesome.com/a076d05399.js'></script>
+<body>
+<nav class="navigation">
+    <ul class="navigation-list">
+        <li class="navigation-item">
+            <a class="navigation-link" href="main-page.html">
+                <i class='fas fa-crow' style='font-size:30px;color:white'></i>
+            </a>
+        </li>
+        <li class="navigation-item" style="margin-left: 10px">
+            <div id="search-div"><i class="fa fa-search"></i><input class="search-input" id="search-input" type="text" placeholder="What are you looking for?"></div>
+        </li>
+        <li class="navigation-item">
+            <a class="navigation-link" href="create-publication.html">Create publication</a>
+        </li>
+        <li class="navigation-item  has-sub-nav" id="nav-login-btn">
+            <a class="navigation-link" id="user-profile-info" href="#"></a>
+            <ul class="sub-navigation">
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-profile.html">My profile</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-orders.html">My orders</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-publications.html">My publications</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-purchases.html">My purchases</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="cart-page.html" id="nav-cart-href">My cart</a>
+                </li>
+                <li class="sub-navigation-item" id="log-out-btn">
+                    <a class="sub-navigation-link" href="#">Log out</a>
+                </li>
+            </ul>
+        </li>
+        <li id="nav-cart-btn" class="navigation-item">
+            <a class="navigation-link" href="cart-page.html"><i class="fa">&#xf07a;</i></a>
+        </li>
+    </ul>
+</nav>
+<div class="single-publication-container">
+</div>
+<button id="add-to-cart-button">Add to cart</button>
+
+<div id="modal" class="modal">
+    <div id="modal-content">
+        <div id="modal-message"></div>
+        <div id="modal-action-content"></div>
+        <div id="modal-buttons">
+            <button id="close-modal-button">Close</button>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/nav.js"></script>
+<script>
+    const API_URL = 'http://localhost:8080';
+    const $addToCartBtn = $('#add-to-cart-button');
+    const $modal = $('#modal');
+    const $modalMessageHolder = $('#modal-message');
+    const $modalCloseBtn = $('#close-modal-button');
+    const $modalActionsContent = $('#modal-action-content');
+    const $modalButtons = $('#modal-buttons');
+
+    let id;
+
+
+    $(document).ready(() => {
+        let url = new URL(window.location.href);
+        id = url.searchParams.get('id');
+        loadPublication(id);
+    });
+
+    function loadPublication(id){
+        // console.log(window.location.href);
+        console.log('id in request:' + id)
+        $.ajax({
+            url: `${API_URL}/publication/find?id=${id}`,
+            type: 'get',
+            success: function (response) {
+                // console.log(response);
+                let link = response.imageName ? `http://localhost:8080/image/${response.imageName}` : "https://novi-vorota.com.ua/catalog/view/theme/novivorota/images/notfound.png";
+                // console.log(link);
+                $('.single-publication-container').append(`
+           <input type="text" id="user-id-holder" value="${response.userId}" style="display: none">
+        <div class="item-catalog-list">
+            <div class="image-container-catalog-list to-single-page">
+                <img class="main-image" src="${link}" alt="">
+            </div>
+            <div class="publication-info-catalog-list">
+            <div class="publication-main-info-catalog-list">
+                <div class="publication-name-catalog-list">
+                    ${response.name}
+                    <div class="publication-category-catalog-list">${response.category}/${response.subcategory}</div>
+                </div>
+                <div class="publication-description-catalog-list">
+                    ${response.description}
+                </div>
+                <div class="publication-price-catalog-list">
+                    ${response.price} $
+                    <div class="publication-type-catalog-list">
+                    ${response.type}
+                    </div>
+                </div>
+            </div>
+            <div class="publication-delivery-catalog-list">
+            ${response.delivery}
+            <div class="publication-id-catalog-list">Publication id: <div id="id-container">${response.id}</div></div>
+            </div>
+            </div>
+            </div>`)
+            }
+        });
+    }
+
+    $addToCartBtn.click(() => {
+        if (window.localStorage.getItem('userId') === $('#user-id-holder').val()){
+            showModalMessage('you cant add your items in cart');
+        } else {
+            let request = {
+                count: 1,
+                publicationId: id
+            };
+            $.ajax({
+                url: `${API_URL}/cart`,
+                contentType: 'application/json',
+                headers: {
+                    "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                },
+                type: 'post',
+                data: JSON.stringify(request),
+                success: function (response) {
+                    if (!response) showModalMessage('You already have this item in cart');
+                    else showModalMessage('Item added to cart!');
+                },
+            })
+        }
+    });
+
+    function showModalMessage(message) {
+        $modalMessageHolder.html('');
+        $modalButtons.find($('.modal-btn')).remove();
+        $modalActionsContent.html('');
+        $modalMessageHolder.append(`
+        <label>${message}</label>
+        `)
+        $modalCloseBtn.html('ok');
+        $modalButtons.css('justify-content','center');
+        $modal.css('display', 'block');
+    }
+
+    $modalCloseBtn.click(() => {
+        $modalCloseBtn.html('Close');
+        $modalMessageHolder.html('');
+        $modalActionsContent.html('');
+        $modal.css('display', 'none')
+        $modalButtons.find($('.modal-btn')).remove();
+        $modalButtons.css('justify-content','none');
+    });
+</script>
+</html>

@@ -1,0 +1,51 @@
+
+.address-input[disabled]{
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #000000;
+}
+
+.address-input{
+    font-size: 20px;
+    color: #000000;
+}
+
+.address-items-container{
+    width: 300px;
+    display: flex;
+    justify-content: space-between;
+}
+
+#profile-info{
+    width: 70%;
+    height: 40%;
+    display: flex;
+}
+
+#user-info{
+    width: 40%;
+}
+
+#user-name-container{
+    width: 100%;
+    font-size: 20px;
+    color: #000000;
+}
+
+#user-phone-container{
+    width: 100%;
+    font-size: 20px;
+    color: #000000;
+}
+
+#user-avatar-image{
+    height: 200px;
+}
+
+.user-info-input[disabled]{
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #000000;
+}

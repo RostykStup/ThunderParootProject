@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My orders</title>
+    <link rel="icon" href="https://pokemon.gameinfo.io/images/pokemon-go/018-00.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/navStyle.css">
+    <link rel="stylesheet" href="css/my-orders.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+</head>
+<body>
+<nav class="navigation">
+    <ul class="navigation-list">
+        <li class="navigation-item">
+            <a class="navigation-link" href="main-page.html">
+                <i class='fas fa-crow' style='font-size:30px;color:white'></i>
+            </a>
+        </li>
+        <li class="navigation-item" style="margin-left: 10px">
+            <div id="search-div"><i class="fa fa-search"></i><input class="search-input" id="search-input" type="text" placeholder="What are you looking for?"></div>
+        </li>
+        <li class="navigation-item">
+            <a class="navigation-link" href="create-publication.html">Create publication</a>
+        </li>
+        <li class="navigation-item  has-sub-nav" id="nav-login-btn">
+            <a class="navigation-link" id="user-profile-info" href="#"></a>
+            <ul class="sub-navigation">
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-profile.html">My profile</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-orders.html">My orders</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-publications.html">My publications</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-purchases.html">My purchases</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="cart-page.html" id="nav-cart-href">My cart</a>
+                </li>
+                <li class="sub-navigation-item" id="log-out-btn">
+                    <a class="sub-navigation-link" href="#">Log out</a>
+                </li>
+            </ul>
+        </li>
+        <li id="nav-cart-btn" class="navigation-item">
+            <a class="navigation-link" href="cart-page.html"><i class="fa">&#xf07a;</i></a>
+        </li>
+    </ul>
+</nav>
+<div id="container">
+    <div id="main-label-container">My orders</div>
+    <div id="publications-container">
+        <div class="page-buttons-container">
+        </div>
+        <div id="content-container"></div>
+        <div class="page-buttons-container">
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/nav.js">
+</script>
+<script>
+    const API_URL = 'http://localhost:8080';
+    const $pageButtonsContainer = $('.page-buttons-container');
+    const $contentContainer = $('#content-container');
+
+    $(document).ready(() => {
+        if (!window.localStorage.getItem('username')) {
+            window.location.href = 'login.html';
+        } else {
+            $.ajax({
+                url: `${API_URL}/order?direction=DESC&field=id&page=0&size=5`,
+                contentType: 'application/json',
+                headers: {
+                    "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                },
+                type: 'get',
+                success: function (response) {
+                    console.log(response);
+                    if (response.totalElements === 0) {
+                        appendEmptyPage();
+                    }else {
+                        appendPageButtons(response.totalPages);
+                        actionsOnPageButtons();
+                        appendOrdersToContainer(response.data);
+                        actionsOnDetailsButton();
+                        findButtonByPage(0);
+                        actionsOnSentButton();
+                    }
+                },
+            })
+        }
+    });
+
+    function actionsOnPageButtons() {
+        $('.page-button').click((e) => {
+            let page = +e.target.value - 1;
+            $.ajax({
+                url: `${API_URL}/order?direction=DESC&field=id&page=${page}&size=5`,
+                contentType: 'application/json',
+                headers: {
+                    "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                },
+                type: 'get',
+                // data: JSON.stringify(request),
+                success: function (response) {
+                    $contentContainer.html('');
+                    $pageButtonsContainer.html('');
+                    appendPageButtons(response.totalPages);
+                    actionsOnPageButtons();
+                    appendOrdersToContainer(response.data);
+                    actionsOnDetailsButton();
+                    findButtonByPage(page);
+                    actionsOnSentButton();
+                },
+            })
+        })
+    }
+
+    function appendOrdersToContainer(orders) {
+        for (let order of orders) {
+            appendOrderToContainer(order);
+        }
+    };
+    function appendEmptyPage() {
+        $contentContainer.append(`
+        <div class="empty-page-container">
+        You do not have any orders, wait for them or add more publications
+        <div><a href="create-publication.html">Create publication</a></div>
+        </div>
+        `)
+    }
+
+    function findButtonByPage(page) {
+        $('.page-button').each((i, e) => {
+            let current = +e.value - 1;
+            if (current === page) {
+                e.style.backgroundColor = '#819EA0';
+            }
+        });
+    }
+
+    function appendOrderToContainer(order) {
+        $contentContainer.append(`
+        <div class="item-order">
+            <div class="item-header">
+                <div class="order-id-container">order id: ${order.id}  </div>
+                <div>Buyer: <a href="user-profile.html?id=${order.shopperId}">${order.shopperName}</a>
+                </div>
+                <div>Order time: ${order.creationDate}</div>
+            </div>
+            <div class="item-list">
+                <div><button class="order-details-button" value="${order.id}">details</button></div>
+                <div class="purchases">
+                </div>
+            </div>
+            <div class="item-sum">
+
+            </div>
+        </div>
+        `);
+        let purchasesHolder = $contentContainer.children().last().children().children().filter($('.purchases'));
+        let viewHolder = $contentContainer.children().last().children().children().filter($('.order-id-container'));
+        let buttonHolder = $contentContainer.children().last().children().filter($('.item-header'));
+        purchasesHolder.slideUp();
+        appendPurchasesAndAddressToOrderItem(purchasesHolder, order);
+        appendViewedLabel(viewHolder,order);
+        appendDeliveryButton(buttonHolder,order);
+    }
+
+    function appendDeliveryButton(holder, order) {
+        let msg;
+        if (order.isCanceled){
+            msg = 'Unfortunately, the buyer canceled the order';
+            appendOrderStatus(holder,msg);
+        } else {
+            if (order.isSent){
+                msg = 'Wait for the buyer to confirm the order';
+                if (order.isFinished){
+                    msg = 'The buyer received the order';
+                    appendOrderStatus(holder,msg);
+                } else {
+                    appendOrderStatus(holder,msg);
+                }
+            } else {
+                msg = 'The buyer is waiting for shipment';
+                appendOrderStatus(holder,msg);
+                holder.append(`
+                <div>
+                    <button class="sent-button btn" value="${order.id}">Sent</button>
+                </div>`)
+            }
+        }
+    }
+
+    function actionsOnSentButton() {
+        $('.sent-button').click((e) => {
+            let id = $(e.target).val();
+            $.ajax({
+                url: `${API_URL}/order/deliver?id=` + id,
+                contentType: 'application/json',
+                headers: {
+                    "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                },
+                type: 'put',
+                success: window.location.reload()
+            })
+        });
+    };
+
+    function appendOrderStatus(holder, status){
+        holder.append(`
+        <div class="status-container ">${status}</div>
+        `)
+    }
+
+    function appendViewedLabel(holder,order) {
+        if (!order.isViewed){
+            holder.append(`
+            <div class="new-item-container">NEW</div>
+            `);
+        }
+    }
+
+    function actionsOnDetailsButton() {
+        $('.order-details-button').click((e) => {
+            let $btn = $(e.target);
+            let purchaseContainer = $btn.parent().next();
+            if (purchaseContainer.is(':visible')){
+                purchaseContainer.slideToggle('fast');
+                $btn[0].style.backgroundColor = '#e1e1e1';
+
+            } else {
+                purchaseContainer.slideToggle('slow');
+                $btn[0].style.backgroundColor = '#ffffff';
+                let id = $btn.val();
+                $.ajax({
+                    url: `${API_URL}/order/view?id=` + id,
+                    contentType: 'application/json',
+                    headers: {
+                        "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                    },
+                    type: 'put',
+                    success: console.log('ok')
+                })
+            }
+        })
+    }
+
+    function appendPurchasesAndAddressToOrderItem(holder,order) {
+        for (let purchase of order.purchases ){
+            let link = purchase.image ? `http://localhost:8080/image/${purchase.image}` : "https://novi-vorota.com.ua/catalog/view/theme/novivorota/images/notfound.png";
+            holder.append(`
+        <div class="purchase-item">
+            <div class="image-container-purchase-item">
+            <img src="${link}" class="image-purchase-item">
+            </div>
+            <div class="info-container-purchase-item">
+                <div>Name: <a href="publication.html?id=${purchase.publicationId}">${purchase.name}</a></div>
+                <div>Count ${purchase.count}</div>
+                <div>Total price: $${purchase.price}</div>
+            </div>
+        </div>
+        `);
+        }
+
+        holder.append(`
+        <div class="item-delivery-info">
+            <div>
+                Address:
+                <div>Country: ${order.address.country}</div>
+                <div>City: ${order.address.city}</div>
+                <div>Street ${order.address.street}</div>
+            </div>
+            <div>
+                Sum: $${order.sum}
+            </div>
+        </div>
+        `);
+    }
+
+    function appendPageButtons(pages) {
+        for (let i = 1; i <= pages; i++) {
+            $pageButtonsContainer.append(`
+        <button class="page-button" value="${i}">${i}</button>
+        `)
+        }
+    };
+
+</script>
+</html>

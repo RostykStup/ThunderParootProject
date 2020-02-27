@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>type</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="css/modalAdimin.css">
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+</head>
+<body>
+    <nav>
+        <select id="page-size-select">
+<!--            <option value="2">2</option>-->
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+        </select>
+        <button id="decrement-page-num-btn"><-</button>
+        <span id="page-number">1</span>
+        <button id="increment-page-num-btn">-></button>
+    </nav>
+    <button id="open-create-modal-btn">Create</button>
+
+    <div id="create-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-body">
+                <input type="text" class="inp" id="create-entity-name" placeholder="Name">
+            </div>
+            <div class="modal-footer">
+                <button id ="create-btn">Create</button>
+                <button class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="update-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-body">
+                <input type="text" class="inp" id="update-entity-name" placeholder="Name">
+                <input type="text" id="update-entity-id" placeholder="name" style="display: none">
+            </div>
+            <div class="modal-footer">
+                <button id="update-btn">Update</button>
+                <button class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <table>
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="entities">
+
+            </tbody>
+        </table>
+    </div>
+</body>
+<script src="js/requests.js"></script>
+<script src="js/modal.js"></script>
+<script>
+    const entity = 'type';
+    actionsSimpleEntity(entity);
+</script>
+</html>

@@ -1,0 +1,159 @@
+body{
+    height: 100%;
+}
+
+
+#container{
+    height: 100%;
+    width: 65%;
+    margin: 0 auto;
+    padding: 5%;
+    box-shadow: 0 200px 400px 1px #898989;
+}
+
+#main-label-container{
+    font-size: 40px;
+    margin: 10px;
+    height: 20%;
+    width: 100%;
+    display: block;
+}
+
+#publications-container{
+    width: 100%;
+}
+
+.page-buttons-container{
+    width: 100%;
+    /*height: 50px;*/
+}
+
+.empty-page-container{
+    font-size: 30px;
+    color: #00c4cb;
+}
+
+.page-button{
+    /*padding: 0 0 5px 0;*/
+
+    border: none;
+    background-color: #2f3ea0;
+    height: 30px;
+    width: 30px;
+
+    border-radius: 2px;
+
+    font-size: 15px;
+    font-weight: bold;
+    color: white;
+
+    transition: all .3s;
+}
+
+
+
+.page-button:hover{
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+#content-container{
+    /*padding: 40px 0 40px;*/
+    width: 100%;
+    height: 90%;
+    /*background-color: #b82759;*/
+}
+
+.item{
+   height: 300px;
+    display: flex;
+}
+
+.publication-item-container:hover{
+    box-shadow: 0 0 10px 1px #898989;
+}
+
+.item-image-container{
+    padding: 10px;
+    height: 100%;
+    width: 30%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.item label{
+    font-size: 15px;
+    color: #525252;
+}
+
+.item-input[disabled]{
+    -webkit-appearance: none;
+    -moz-appearance:textfield;
+    border: none;
+    background: none;
+    font-size: 17px;
+    color: black;
+}
+
+.item-input{
+    font-size: 17px;
+    color: black;
+}
+
+.item-input select{
+    font-size: 17px;
+    color: black;
+}
+
+.item-other{
+    padding: 10px;
+    /*display: flex;*/
+}
+
+.item-image-container img{
+    max-height: 90%;
+    max-width: 100%;
+}
+
+.item-main-info{
+    /*display: flex;*/
+    /*justify-content: space-between;*/
+    padding: 10px;
+    width: 50%;
+}
+
+.description-input{
+    height: 75%;
+}
+
+.btn{
+    border: none;
+    height: 40px;
+    border-radius: 5px;
+    background-color: #7589bd;
+    color: white;
+    font-size: 25px;
+    transition: all .5s;
+}
+
+.btn:hover{
+    cursor: pointer;
+    background-color: #0d8262;
+}
+
+.delete-button{
+    background-color: #00f7ff;
+    color: black;
+    border: 1px solid black;
+    transition: all .5s;
+}
+
+.delete-button:hover{
+    background-color: #00a1a8;
+    color: black;
+    border: 1px solid black;
+}
+
+.images-holder{
+    padding: 10px;
+}

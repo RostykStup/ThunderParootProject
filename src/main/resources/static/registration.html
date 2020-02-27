@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="css/navStyle.css">
+<script src='https://kit.fontawesome.com/a076d05399.js'></script>
+<body>
+<nav class="navigation">
+    <ul class="navigation-list">
+        <li class="navigation-item">
+            <a class="navigation-link" href="main-page.html">
+                <i class='fas fa-crow' style='font-size:30px;color:white'></i>
+            </a>
+        </li>
+        <li class="navigation-item" style="margin-left: 10px">
+            <div id="search-div"><i class="fa fa-search"></i><input class="search-input" id="search-input" type="text" placeholder="What are you looking for?"></div>
+        </li>
+        <li class="navigation-item">
+            <a class="navigation-link" href="create-publication.html">Create publication</a>
+        </li>
+        <li class="navigation-item  has-sub-nav" id="nav-login-btn">
+            <a class="navigation-link" id="user-profile-info" href="#"></a>
+            <ul class="sub-navigation">
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-profile.html">My profile</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-orders.html">My orders</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-publications.html">My publications</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-purchases.html">My purchases</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="cart-page.html" id="nav-cart-href">My cart</a>
+                </li>
+                <li class="sub-navigation-item" id="log-out-btn">
+                    <a class="sub-navigation-link" href="#">Log out</a>
+                </li>
+            </ul>
+        </li>
+        <li id="nav-cart-btn" class="navigation-item">
+            <a class="navigation-link" href="cart-page.html"><i class="fa">&#xf07a;</i></a>
+        </li>
+    </ul>
+</nav>
+<input type="text" placeholder="login" id="user-registration-login">
+<input type="text" placeholder="password" id="user-registration-password">
+<input type="text" placeholder="username" id="user-registration-name">
+<input type="text" placeholder="phone number" id="user-registration-number">
+<input type="file" id="user-registration-avatar-image">
+<button id="user-registration-button">Registration</button>
+</body>
+<script>
+    const API_URL = 'http://localhost:8080/';
+    const $loginInput = $('#user-registration-login');
+    const $passwordInput = $('#user-registration-password');
+    const $nameInput = $('#user-registration-name');
+    const $imageInput = $('#user-registration-avatar-image');
+    const $phoneNumberInput = $('#user-registration-number');
+    const $registrationButton = $('#user-registration-button');
+
+    // $.ajax({
+    //     url: `${API_URL}country`,
+    //     type: 'get',
+    //     success: function (response) {
+    //         for (const country of response) {
+    //             $countrySelect.append(`<option value="${country.id}">${country.name}</option>`)
+    //         }
+    //     }
+    // });
+
+    $registrationButton.click(() => {
+       let request = {
+           login : $loginInput.val(),
+           password : $passwordInput.val(),
+           username : $nameInput.val(),
+           phoneNumber : $phoneNumberInput.val(),
+       }
+        getBase64FromFile($imageInput[0].files[0])
+            .then(image => request.image = image)
+            .catch(image => request.image = null)
+            .finally( () => {
+                    $.ajax({
+                        url: `${API_URL}user/register`,
+                        contentType: 'application/json',
+                        type: 'post',
+                        data: JSON.stringify(request),
+                        success: function (response) {
+                            console.log('ok');
+                            $imageInput.value = '';
+                            $nameInput.val('');
+                            $loginInput.val('');
+                            $passwordInput.val('');
+                            $phoneNumberInput.val('0');
+                            console.log(response);
+                            window.localStorage.setItem('userToken', response.token);
+                            window.localStorage.setItem('username', response.username);
+                            window.localStorage.setItem('userId', response.id);
+                            window.location.href = 'my-profile.html';
+                        },
+                        // error: function (response) {
+                        //     console.log(response);
+                        // }
+                    })
+                }
+            );
+    });
+
+
+    const getBase64FromFile = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    };
+
+</script>
+<script src="js/nav.js"></script>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>filtration</title>
+    <link rel="icon" href="https://pokemon.gameinfo.io/images/pokemon-go/018-00.png">
+    <link rel="stylesheet" href="css/publicationInCatalogStyle.css">
+    <link rel="stylesheet" href="css/navStyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    body, html {
+        height: 100%;
+    }
+
+    .container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+    }
+
+    .filtration-container {
+        width: 20%;
+        /*background-color: blue;*/
+    }
+
+    .content-container {
+        width: 80%;
+    }
+
+    .pagination-container {
+        width: 100%;
+        height: 50px;
+    }
+
+    .catalog-container {
+        width: 100%;
+        height: 90%;
+    }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<body>
+<nav class="navigation">
+    <ul class="navigation-list">
+        <li class="navigation-item">
+            <a class="navigation-link" href="main-page.html">
+                <i class='fas fa-crow' style='font-size:30px;color:white'></i>
+            </a>
+        </li>
+        <li class="navigation-item" style="margin-left: 10px">
+            <div id="search-div"><i class="fa fa-search"></i><input class="search-input" id="search-input" type="text" placeholder="What are you looking for?"></div>
+        </li>
+        <li class="navigation-item">
+            <a class="navigation-link" href="create-publication.html">Create publication</a>
+        </li>
+        <li class="navigation-item  has-sub-nav" id="nav-login-btn">
+            <a class="navigation-link" id="user-profile-info" href="#"></a>
+            <ul class="sub-navigation">
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-profile.html">My profile</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-orders.html">My orders</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-publications.html">My publications</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-purchases.html">My purchases</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="cart-page.html" id="nav-cart-href">My cart</a>
+                </li>
+                <li class="sub-navigation-item" id="log-out-btn">
+                    <a class="sub-navigation-link" href="#">Log out</a>
+                </li>
+            </ul>
+        </li>
+        <li id="nav-cart-btn" class="navigation-item">
+            <a class="navigation-link" href="cart-page.html"><i class="fa">&#xf07a;</i></a>
+        </li>
+    </ul>
+</nav>
+<div class="container">
+    <div class="filtration-container">
+        <div id="price-filter">
+            <label><p>Min price</p>
+                <input type="text" id="min-price-input"></label>
+            <label>
+                <p>Max price</p>
+                <input type="text" id="max-price-input"></label>
+        </div>
+
+        <div id="categories-filter-container" style="padding: 5px">
+            <label>Category</label>
+            <select id="category-filter-select">
+                <option value="0">Category</option>
+            </select>
+        </div>
+
+        <div id="subcategories-filter-container" style="padding: 5px">
+            <label>Subcategories</label>
+            <div>
+
+            </div>
+        </div>
+        <div id="image-filter">
+            <label>
+                <input type="checkbox" id="image-available-box">Only with image
+            </label>
+        </div>
+        <button id="filter">Filter</button>
+    </div>
+    <div class="content-container">
+        <div class="pagination-container">
+            <label for="page-size-select">Page size</label>
+            <select id="page-size-select">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="40">40</option>
+            </select>
+            <label for="sort-field-select">Sort by</label>
+            <select id="sort-field-select">
+                <option value="id">id</option>
+                <option value="name">name</option>
+                <option value="price">price</option>
+            </select>
+            <label>Direction</label>
+            <input type="radio" class="direction-btn" value="ASC" name="sort" checked>ASC
+            <input type="radio" class="direction-btn" value="DESC" name="sort">DESC
+
+            <button id="prev-btn"><</button>
+            <span id="page-number">1</span>
+            <button id="next-btn">></button>
+        </div>
+        <div class="catalog-container">
+            <div class="content"></div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/nav.js"></script>
+<script src="js/filter.js">
+</script>
+<script>
+
+
+</script>
+</html>

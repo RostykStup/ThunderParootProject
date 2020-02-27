@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My cart</title>
+    <link rel="icon" href="https://pokemon.gameinfo.io/images/pokemon-go/018-00.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/navStyle.css">
+    <link rel="stylesheet" href="css/my-modal.css">
+    <link rel="stylesheet" href="css/cart-page.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+</head>
+<body>
+<nav class="navigation">
+    <ul class="navigation-list">
+        <li class="navigation-item">
+            <a class="navigation-link" href="main-page.html">
+                <i class='fas fa-crow' style='font-size:30px;color:white'></i>
+            </a>
+        </li>
+        <li class="navigation-item" style="margin-left: 10px">
+            <div id="search-div"><i class="fa fa-search"></i><input class="search-input" id="search-input" type="text" placeholder="What are you looking for?"></div>
+        </li>
+        <li class="navigation-item">
+            <a class="navigation-link" href="create-publication.html">Create publication</a>
+        </li>
+        <li class="navigation-item  has-sub-nav" id="nav-login-btn">
+            <a class="navigation-link" id="user-profile-info" href="#"></a>
+            <ul class="sub-navigation">
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-profile.html">My profile</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-orders.html">My orders</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-publications.html">My publications</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-purchases.html">My purchases</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="cart-page.html" id="nav-cart-href">My cart</a>
+                </li>
+                <li class="sub-navigation-item" id="log-out-btn">
+                    <a class="sub-navigation-link" href="#">Log out</a>
+                </li>
+            </ul>
+        </li>
+        <li id="nav-cart-btn" class="navigation-item">
+            <a class="navigation-link" href="cart-page.html"><i class="fa">&#xf07a;</i></a>
+        </li>
+    </ul>
+</nav>
+<div id="container">
+    <div id="page-info-container">
+        My cart
+    </div>
+    <div id="items-container">
+    </div>
+    <div id="purchase-container">
+        <button id="make-purchase-button">PURCHASE</button>
+    </div>
+</div>
+
+<div id="modal" class="modal">
+    <div id="modal-content">
+        <div id="modal-message"></div>
+        <div id="modal-action-content"></div>
+        <div id="modal-buttons">
+            <button id="close-modal-button">Close</button>
+        </div>
+    </div>
+</div>
+
+</body>
+<script src="js/nav.js">
+</script>
+<script>
+    const API_URL = 'http://localhost:8080';
+    const $itemsContainer = $('#items-container');
+    const $purchaseBtn = $('#make-purchase-button');
+    const $modal = $('#modal');
+    const $modalMessageHolder = $('#modal-message');
+    const $modalCloseBtn = $('#close-modal-button');
+    const $modalActionsContent = $('#modal-action-content');
+    const $modalButtons = $('#modal-buttons');
+
+    // creationModal.css("display","block");
+
+    $(document).ready(() => {
+        $.ajax({
+            url: `${API_URL}/cart`,
+            contentType: 'application/json',
+            headers: {
+                "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+            },
+            type: 'get',
+            success: function (response) {
+                console.log(response);
+                if (response.data.length === 0){
+                    $itemsContainer.append(`Your cart is empty`);
+                    $purchaseBtn.attr('disabled','true');
+                }
+            else {
+                    $itemsContainer.append(`<button id="select-all-btn">Select all</button>`);
+                    for (let publication of response.data) {
+                        let link = publication.image ? `http://localhost:8080/image/${publication.image}` : "https://novi-vorota.com.ua/catalog/view/theme/novivorota/images/notfound.png";
+                        $itemsContainer.append(`
+                <div class="cart-item">
+                    <div class="cart-check-item">
+                        <input type="checkbox" class="cart-check-btn" value="${publication.id}">
+                     </div>
+                     <div class="cart-item-info">
+                         <div class="cart-item-image-container">
+                            <img src="${link}">
+                         </div>
+                        <div class="cart-item-name">${publication.name}</div>
+                        <div class="cart-item-seller-name"><a href="user-view-page.html?id=${publication.userId}">Seller: ${publication.userName}</a></div>
+                      </div>
+                      <div class="cart-item-actions">
+                        <button class="minus-btn" value="${publication.id}">-</button><span>${publication.count}</span><button class="plus-btn" value="${publication.id}">+</button>
+                        <input type="text" class="max-count-holder" value="${publication.publicationCount}" style="display: none">
+                        <div class="cart-item-price">$ ${publication.price}</div>
+                        <div class="cart-delete-item"><button value="${publication.id}" class="delete-item-button">delete</button></div>
+                     </div>
+                </div>
+                    `);
+                    }
+                }
+                actionsOnPlusButton();
+                actionsOnMinusButton();
+                actionsOfDeleteBtn();
+                actionsOnSelectAllBtn();
+            },
+        })
+    });
+
+    function actionsOnSelectAllBtn() {
+        $('#select-all-btn').click(() => {
+            if ($('#select-all-btn').html() === 'Select all') {
+                $('.cart-check-btn').each((i, e) => {
+                    e.checked = true;
+                });
+                $('#select-all-btn').html('Deselect');
+            } else {
+                $('.cart-check-btn').each((i, e) => {
+                    e.checked = false;
+                });
+                $('#select-all-btn').html('Select all');
+            }
+        });
+    }
+
+    function showModalMessage(message) {
+        $modalMessageHolder.html('');
+        $modalButtons.find($('.modal-btn')).remove();
+        $modalActionsContent.html('');
+        $modalMessageHolder.append(`
+        <label>${message}</label>
+        `)
+        $modalCloseBtn.html('ok');
+        $modalButtons.css('justify-content','center')
+        $modal.css('display', 'block');
+    }
+
+    $modalCloseBtn.click(() => {
+        $modalCloseBtn.html('Close');
+        $modalMessageHolder.html('');
+        $modalActionsContent.html('');
+        $modal.css('display', 'none')
+        $modalButtons.find($('.modal-btn')).remove();
+        $modalButtons.css('justify-content','none');
+    });
+    
+    function getUserAddress() {
+        $.ajax({
+            url: `${API_URL}/user/address`,
+            contentType: 'application/json',
+            headers: {
+                "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+            },
+            type: 'get',
+            success: function (response) {
+                appendAddressToModal(response);
+                actionsOnEditAddressButton();
+            },
+        })
+    }
+
+    function appendAddressToModal(address) {
+        $modalActionsContent.append(`
+        <div id="address-container">
+        <label class="little-label">Your address:</label>
+        <div class="address-items-container big-label"><label>street:</label><input value="${address.street}" id="address-street-container" type="text" class="address-input" disabled></div>
+        <div class="address-items-container big-label"><label>city:</label><input  value="${address.city}" id="address-city-container"  type="text" class="address-input" disabled></div>
+        <div class="address-items-container big-label"><label>country:</label><input value="${address.country}" id="address-country-container" type="text" class="address-input" disabled></div>
+        <div id="edit-button-container"><button id="address-edit-button">Edit</button></div>
+        </div>
+        `)
+    }
+    function actionsOnEditAddressButton() {
+        let $addressEditBtn = $('#address-edit-button');
+        const $addressCountryInput = $('#address-country-container');
+        const $addressCityInput = $('#address-city-container');
+        const $addressStreetInput = $('#address-street-container');
+        $addressEditBtn.click(() => {
+            console.log($('.address-input').prop('disabled'));
+            if ($('.address-input').prop('disabled')) {
+                $('.address-input').removeAttr("disabled");
+                $addressEditBtn.html('Save')
+            } else {
+                let request = {
+                    country: $addressCountryInput.val(),
+                    city: $addressCityInput.val(),
+                    street: $addressStreetInput.val()
+                };
+                $.ajax({
+                    url: `${API_URL}/user/changeAddress`,
+                    contentType: 'application/json',
+                    headers: {
+                        "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                    },
+                    type: 'post',
+                    data: JSON.stringify(request),
+                    success: function (response) {
+                    },
+                })
+                $('.address-input').prop("disabled", true);
+                $addressEditBtn.html('Edit');
+            }
+        });
+    }
+
+    function showPurchaseModal(publicationsId){
+        $modalMessageHolder.append(`<label class="big-label">Please verify your address before confirm</label>`)
+        getUserAddress();
+        $modalButtons.prepend(`<button id="confirm-purchase-button" class="modal-btn">Confirm</button>`)
+        $modal.css('display', 'block');
+        actionsOnConfirmButton(publicationsId)
+    }
+
+    function actionsOnConfirmButton(publicationsId){
+        $('#confirm-purchase-button').click(() =>{
+            let request = {
+                    publicationsForPurchaseId: publicationsId
+                };
+            console.log(JSON.stringify(request));
+                $.ajax({
+                    url: `${API_URL}/purchase`,
+                    contentType: 'application/json',
+                    headers: {
+                        "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                    },
+                    type: 'post',
+                    data: JSON.stringify(request),
+                    success: function () {
+                        window.location.href = 'my-purchases.html'
+                    },
+                    // error :alert('error')
+                })
+        })
+    }
+
+    $purchaseBtn.click(() => {
+        const publicationsId = [];
+        $('.cart-check-btn').each((i, e) => {
+            if (e.checked) {
+                publicationsId.push(+e.value);
+            }
+        });
+        if (publicationsId[0] === undefined) {
+            showModalMessage('You have not selected any items')
+        } else {
+            showPurchaseModal(publicationsId);
+        }
+    });
+
+    function actionsOnPlusButton() {
+        $('.plus-btn').click((e) => {
+            let $btn = $(e.target);
+            let id = e.target.value;
+            let span = $btn.siblings('span');
+            let num = span.html();
+            if (num < +$btn.siblings('.max-count-holder').val()) {
+                span.html(+span.html() + 1);
+            }
+            num = $btn.siblings('span').html();
+            // console.log(count);
+            let request = {
+                count: num
+            };
+            $.ajax({
+                url: `${API_URL}/cart?id=${id}`,
+                contentType: 'application/json',
+                headers: {
+                    "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                },
+                type: 'put',
+                data: JSON.stringify(request),
+                success: function () {
+                }
+            })
+        });
+    };
+
+    function actionsOnMinusButton() {
+        $('.minus-btn').click((e) => {
+            let $btn = $(e.target);
+            let id = e.target.value;
+            let span = $btn.siblings('span');
+            let num = span.html();
+            if (num > 1) {
+                span.html(+span.html() - 1);
+                num--;
+            }
+            let request = {
+                count: num
+            };
+            $.ajax({
+                url: `${API_URL}/cart?id=${id}`,
+                contentType: 'application/json',
+                headers: {
+                    "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                },
+                type: 'put',
+                data: JSON.stringify(request),
+                success: function () {
+                }
+            })
+        });
+    };
+
+    function actionsOfDeleteBtn() {
+        $('.delete-item-button').click((e) => {
+            let $btn = $(e.target);
+            let id = e.target.value;
+            $.ajax({
+                url: `${API_URL}/cart?id=${id}`,
+                contentType: 'application/json',
+                headers: {
+                    "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                },
+                type: 'delete',
+                success: function () {
+                    window.location.reload();
+                }
+            })
+        });
+
+    }
+
+</script>
+</html>

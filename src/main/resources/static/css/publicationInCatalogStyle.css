@@ -1,0 +1,131 @@
+*{
+    box-sizing: border-box;
+}
+
+.content{
+    width: 80%;
+}
+
+.item-catalog-list{
+    margin-top: 5px;
+    display: flex;
+    box-sizing: border-box;
+
+    border: 1px solid #d3d3d3;
+    border-radius: 2px;
+    background-color: #f9f9f9;
+
+    width: 100%;
+    height: 150px;
+
+}
+
+.item-catalog-list:hover{
+    box-shadow: 0 0 10px 1px #898989;
+
+}
+
+
+.image-container-catalog-list{
+    padding: 5px;
+    height: 100%;
+    width: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-container-catalog-list img{
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.publication-info-catalog-list{
+  width: 80%;
+  /*  background-color: red;*/
+}
+
+.publication-main-info-catalog-list{
+    width: 100%;
+    height: 70%;
+    display: flex;
+}
+
+.publication-delivery-catalog-list{
+    display: flex;
+    width: 100%;
+    height: 30%;
+    padding: 10px;
+    font-size: 13px;
+    color: #8f8f8f;
+    /*background-color: green;*/
+}
+
+.publication-type-catalog-list{
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+    color: #8f8f8f;
+    /*background-color: green;*/
+}
+
+
+.publication-category-catalog-list{
+    width: 100%;
+    font-size: 15px;
+    color: #8f8f8f;
+    /*background-color: green;*/
+}
+
+.publication-name-catalog-list{
+    padding: 10px;
+    height: 100%;
+    width: 30%;
+    word-wrap: break-word;
+}
+
+.publication-name-catalog-list a{
+     text-decoration: none;
+     border: none;
+ }
+.publication-description-catalog-list{
+    padding: 10px;
+    height: 100%;
+    width: 50%;
+    font-size: 15px;
+    word-wrap: break-word;
+}
+
+.publication-id-catalog-list{
+    display: block;
+    width: 100%;
+    height: 10%;
+    font-size: 11px;
+    color: #8f8f8f;
+}
+.publication-price-catalog-list{
+    text-align: right;
+    padding: 10px;
+    height: 100%;
+    width: 20%;
+}
+
+.to-single-page:hover{
+    cursor: pointer;
+}
+
+.publication-name-btn-catalog-list{
+    font-size: 20px;
+    text-align: left;
+    background: none;
+    border: none;
+}
+
+.delivery-info{
+    width: 30%;
+}
+
+.user-info {
+    width: 30%;
+}
+

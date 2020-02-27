@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My publications</title>
+    <link rel="icon" href="https://pokemon.gameinfo.io/images/pokemon-go/018-00.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/navStyle.css">
+    <link rel="stylesheet" href="css/my-publications.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+</head>
+<body>
+<nav class="navigation">
+    <ul class="navigation-list">
+        <li class="navigation-item">
+            <a class="navigation-link" href="main-page.html">
+                <i class='fas fa-crow' style='font-size:30px;color:white'></i>
+            </a>
+        </li>
+        <li class="navigation-item" style="margin-left: 10px">
+            <div id="search-div"><i class="fa fa-search"></i><input class="search-input" id="search-input" type="text" placeholder="What are you looking for?"></div>
+        </li>
+        <li class="navigation-item">
+            <a class="navigation-link" href="create-publication.html">Create publication</a>
+        </li>
+        <li class="navigation-item  has-sub-nav" id="nav-login-btn">
+            <a class="navigation-link" id="user-profile-info" href="#"></a>
+            <ul class="sub-navigation">
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-profile.html">My profile</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-orders.html">My orders</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-publications.html">My publications</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="my-purchases.html">My purchases</a>
+                </li>
+                <li class="sub-navigation-item">
+                    <a class="sub-navigation-link" href="cart-page.html" id="nav-cart-href">My cart</a>
+                </li>
+                <li class="sub-navigation-item" id="log-out-btn">
+                    <a class="sub-navigation-link" href="#">Log out</a>
+                </li>
+            </ul>
+        </li>
+        <li id="nav-cart-btn" class="navigation-item">
+            <a class="navigation-link" href="cart-page.html"><i class="fa">&#xf07a;</i></a>
+        </li>
+    </ul>
+</nav>
+<div id="container">
+    <div id="main-label-container">My publications</div>
+    <div id="publications-container">
+        <div class="page-buttons-container">
+        </div>
+        <div id="content-container"></div>
+        <div class="page-buttons-container">
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/nav.js">
+</script>
+<script>
+    const API_URL = 'http://localhost:8080';
+    const $pageButtonsContainer = $('.page-buttons-container');
+    const $contentContainer = $('#content-container');
+    // let totalPages;
+
+    $(document).ready(() => {
+        if (!window.localStorage.getItem('username')) {
+            window.location.href = 'login.html';
+        } else {
+            $.ajax({
+                url: `${API_URL}/user/publications?direction=DESC&field=creationDate&page=0&size=5`,
+                contentType: 'application/json',
+                headers: {
+                    "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                },
+                type: 'get',
+                // data: JSON.stringify(request),
+                success: function (response) {
+                    if (response.totalElements === 0) {
+                        appendEmptyPage();
+                    } else {
+                        appendPageButtons(response.totalPages);
+                        actionsOnPageButtons();
+                        appendPublicationsToContainer(response.data);
+                        actionsOnEditButton();
+                        actionsOnDeleteButton();
+                        actionsOnEditImageButtonCLick();
+                        findButtonByPage(0);
+                        actionsOnCloseButton();
+                        actionsOnImageClick();
+                        actionsOnAddButton();
+                        actionsOnChangeImageInput();
+                        actionsOnDeleteImageButton();
+                    }
+                },
+            })
+        }
+    });
+
+    function appendEmptyPage() {
+        $contentContainer.append(`
+        <div class="empty-page-container">
+        You do not have any publications, create some and get money!
+        <div><a href="create-publication.html">Create publication</a></div>
+        </div>
+        `)
+    }
+
+    function appendPageButtons(pages) {
+        for (let i = 1; i <= pages; i++) {
+            $pageButtonsContainer.append(`
+        <button class="page-button" value="${i}">${i}</button>
+        `)
+        }
+    }
+
+    function actionsOnPageButtons() {
+        $('.page-button').click((e) => {
+            let page = +e.target.value - 1;
+            $.ajax({
+                url: `${API_URL}/user/publications?direction=DESC&field=creationDate&page=${page}&size=5`,
+                contentType: 'application/json',
+                headers: {
+                    "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                },
+                type: 'get',
+                // data: JSON.stringify(request),
+                success: function (response) {
+                    $contentContainer.html('');
+                    $pageButtonsContainer.html('');
+                    appendPageButtons(response.totalPages);
+                    actionsOnPageButtons();
+                    appendPublicationsToContainer(response.data);
+                    actionsOnEditButton();
+                    actionsOnDeleteButton();
+                    actionsOnEditImageButtonCLick();
+                    findButtonByPage(page);
+                    actionsOnCloseButton();
+                    actionsOnImageClick();
+                    actionsOnAddButton();
+                    actionsOnChangeImageInput();
+                    actionsOnDeleteImageButton();
+                },
+            })
+        })
+    }
+
+    function findButtonByPage(page) {
+        $('.page-button').each((i, e) => {
+            let current = +e.value - 1;
+            console.log(current + '==' + page);
+            if (current === page) {
+                e.style.backgroundColor = '#819EA0';
+            }
+        });
+    }
+
+    function appendPublicationToContainer(publication) {
+        let link = publication.imageName ? `http://localhost:8080/image/${publication.imageName}` : "https://novi-vorota.com.ua/catalog/view/theme/novivorota/images/notfound.png";
+        $contentContainer.append(`
+    <div class="publication-item-container">
+    <div class="item">
+        <div class="item-image-container">
+            <img src="${link}"  class="item-image">
+        </div>
+        <div class="item-main-info">
+            <label for="name-input">Name:</label>
+                <input type="text" class="name-input item-input" value="${publication.name}" disabled><br>
+            <label for="price-input" >Price:</label>
+                <input type="number" class="price-input item-input" value="${publication.price}" disabled><br>
+            <label for="number-input">Count:</label>
+                <input type="number" class="number-input item-input" value="${publication.number}" disabled>
+            <div class="selects-container">
+            <label for="category-select">Category:</label>
+                <input type="text" class="category-id" value="${publication.categoryId}"  style="display: none">
+                <input type="text" class="subcategory-id" value="${publication.subcategoryId}"  style="display: none">
+                <input type="text" class="type-id" value="${publication.typeId}" style="display: none">
+                <input type="text" class="delivery-id" value="${publication.deliveryId}"  style="display: none">
+                <select class="category-select item-input" disabled>
+                    <option value="${publication.categoryId}" selected>${publication.category}</option>
+                </select><br>
+                <label for="subcategory-select">Subategory:</label>
+                <select class="subcategory-select item-input" disabled>
+                    <option value="${publication.subcategoryId}" selected>${publication.subcategory}</option>
+                </select><br>
+                <label for="delivery-select">Delivery:</label>
+                <select class="delivery-select item-input" disabled>
+                    <option value="${publication.deliveryId}" selected>${publication.delivery}</option>
+                </select><br>
+                <label for="type-select">Type:</label>
+                <select class="type-select item-input" disabled>
+                    <option value="${publication.typeId}" selected>${publication.type}</option>
+                </select>
+            </div>
+            <button class="btn edit-images" value="${publication.id}">Edit images</button>
+        </div>
+        <div class="item-other">
+            <label for="description-input"> Description:</label>
+            <textarea cols="30" rows="10" class="description-input item-input" disabled style="resize: none">${publication.description}</textarea>
+            <button class="edit-button btn" value="${publication.id}">Edit</button>  <button class="delete-button btn" value="${publication.id}" >Delete</button>
+        </div>
+    </div>
+    <div class="images-holder" style="">
+
+    </div>
+    </div>
+        `);
+        $contentContainer.children().last().children().filter($('.images-holder')).slideUp();
+        appendImagesToImageHolder(publication.images);
+    }
+
+    function actionsOnEditImageButtonCLick() {
+        $('.edit-images').click((e) => {
+            let $btn = $(e.target);
+            let $imageHolder = $btn.parent().parent().next();
+            $imageHolder.slideToggle('slow');
+        })
+    }
+
+    function appendImagesToImageHolder(images) {
+        let holder = $contentContainer.children().last().children().filter($('.images-holder'));
+        let id = $contentContainer.children().last().children().children().children().filter($('.delete-button')).val();
+        let imageCount = 0;
+        holder.append(` <label style="font-size: 15px">Double click to select main image</label><br>`);
+        if (images !== null) {
+            for (let image of images) {
+                let link = image ? `http://localhost:8080/image/${image}` : "https://novi-vorota.com.ua/catalog/view/theme/novivorota/images/notfound.png";
+                holder.append(`
+               <img src="${link}" style="height: 100px" data-name="${image}" data-id="${id}" class="image-in-container">
+                <button class="btn delete-image-btn" value="${id}" style="height: 30px">x</button>
+            `);
+                imageCount++;
+            }
+        }
+        holder.append(`
+                <div>
+                <label style="font-size: 15px">You can add 5 images to 1 publication</label><br>
+                <button class="btn add-image-button" value="${id}">Add</button>
+                <input type="file" data-id="${id}" class="add-image-input" style="display: none">
+                <button class="btn close-button">Close</button>
+                </div>
+                `);
+
+
+    }
+
+    function actionsOnDeleteImageButton() {
+        $('.delete-image-btn').click((e) => {
+            let $btn = $(e.target);
+            let id = $btn.val();
+            let image = $btn.prev().attr('data-name');
+            $.ajax({
+                url: `${API_URL}/image?id=${id}&imageName=${image}`,
+                contentType: 'application/json',
+                headers: {
+                    "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                },
+                type: 'delete',
+                success: function (response) {
+                    window.location.reload();
+                },
+            })
+        })
+
+    }
+
+    function actionsOnChangeImageInput() {
+        $('.add-image-input').change((e) => {
+            let $inp = $(e.target);
+            let id = $inp.attr('data-id');
+            let request = {
+                image: 'aa'
+            };
+            getBase64FromFile($inp[0].files[0])
+                .then(image => {
+                    request.image = image;
+                    console.log(image);
+                })
+                .catch(() => alert('Try again'))
+                .finally(() => {
+                    console.log('aaaaaa');
+                    $.ajax({
+                        url: `${API_URL}/image?id=${id}`,
+                        contentType: 'application/json',
+                        headers: {
+                            "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                        },
+                        type: 'put',
+                        data: JSON.stringify(request),
+                        success: function (response) {
+                            window.location.reload();
+                        },
+                    })
+                })
+
+        })
+    }
+
+    function actionsOnAddButton() {
+        $('.add-image-button').unbind('click')
+            .click((e) => {
+                let $btn = $(e.target);
+                e.preventDefault();
+                $btn.siblings().filter($('.add-image-input'))[0].click();
+            })
+    }
+
+    function actionsOnImageClick() {
+        $('.image-in-container').bind('dblclick', function (e) {
+            let imageName = e.target.getAttribute('data-name');
+            let id = e.target.getAttribute('data-id');
+            $.ajax({
+                url: `${API_URL}/image/main?id=${id}&imageName=${imageName}`,
+                contentType: 'application/json',
+                headers: {
+                    "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                },
+                type: 'put',
+                // data: JSON.stringify(request),
+                success: function (response) {
+                    window.location.reload();
+                },
+            })
+        });
+    }
+
+    function actionsOnCloseButton() {
+        $('.close-button').click((e) => {
+            let $btn = $(e.target);
+            let $imageHolder = $btn.parent().parent();
+            $imageHolder.slideUp();
+        })
+    }
+
+
+    function appendPublicationsToContainer(publications) {
+        for (let publication of publications) {
+            appendPublicationToContainer(publication);
+        }
+    }
+
+    function actionsOnEditButton() {
+        $('.edit-button').click((e) => {
+            let $btn = $(e.target);
+            let id = e.target.value;
+
+            const $categorySelect = $btn.parent().parent().children().children().children().filter($('.category-select'));
+            const $subcategorySelect = $btn.parent().parent().children().children().children().filter($('.subcategory-select'));
+            const $deliverySelect = $btn.parent().parent().children().children().children().filter($('.delivery-select'));
+            const $typeSelect = $btn.parent().parent().children().children().children().filter($('.type-select'));
+            const $nameInput = $btn.parent().parent().children().children().filter($('.name-input'));
+            const $priceInput = $btn.parent().parent().children().children().filter($('.price-input'));
+            const $countInput = $btn.parent().parent().children().children().filter($('.number-input'));
+            const $descriptionInput = $btn.siblings($('.description-input'));
+
+            let categoryId = $btn.parent().parent().children().children().children().filter($('.category-id')).val();
+            let subcategoryId = $btn.parent().parent().children().children().children().filter($('.subcategory-id')).val();
+            let deliveryId = $btn.parent().parent().children().children().children().filter($('.delivery-id')).val();
+            let typeId = $btn.parent().parent().children().children().children().filter($('.type-id')).val();
+            if ($btn.prev().prop('disabled')) {
+
+                $btn.parent().parent().children($('.item-input')).children($('.item-input')).filter($('.item-input')).removeAttr("disabled");
+                $btn.parent().parent().children($('.item-input')).children($('.item-input')).children($('.item-input')).filter($('.item-input')).removeAttr("disabled");
+
+                $categorySelect.find('option').remove();
+                $deliverySelect.find('option').remove();
+                $typeSelect.find('option').remove();
+                appendCategoriesToSelect($categorySelect);
+                appendDeliveriesToSelect($deliverySelect);
+                appendTypesToSelect($typeSelect);
+                $categorySelect.val(categoryId);
+                $deliverySelect.val(deliveryId);
+                $typeSelect.val(typeId);
+                actionsOnSelectChange($categorySelect, $subcategorySelect);
+                $btn.html('Save');
+
+            } else {
+                console.log(isNumber($countInput[0].value));
+                console.log(isNumber($priceInput[0].value));
+                if (isNumber($countInput[0].value) && isNumber($priceInput[0].value)) {
+                    let request = {
+                        name: $nameInput.val(),
+                        price: +$priceInput.val(),
+                        description: $descriptionInput.val(),
+                        subcategoryId: $subcategorySelect.val(),
+                        deliveryId: $deliverySelect.val(),
+                        typeId: $typeSelect.val(),
+                        count: +$countInput.val()
+
+                    };
+                    $.ajax({
+                        url: `${API_URL}/publication?id=` + id,
+                        contentType: 'application/json',
+                        headers: {
+                            "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                        },
+                        type: 'put',
+                        data: JSON.stringify(request),
+                        success: function () {
+                            $btn.parent().parent().children($('.item-input')).children($('.item-input')).filter($('.item-input')).prop("disabled", true)
+                            $btn.parent().parent().children($('.item-input')).children($('.item-input')).children($('.item-input')).filter($('.item-input')).prop("disabled", true)
+                            $btn.html('Edit');
+                        },
+                    })
+                } else alert('Count and price field must be number value!')
+            }
+        })
+    }
+
+    function actionsOnDeleteButton() {
+        $('.delete-button').click((e) => {
+            let $btn = $(e.target);
+            let id = e.target.value;
+            $.ajax({
+                url: `http://localhost:8080/publication?id=` + id,
+                type: 'delete',
+                headers: {
+                    "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                },
+                success: function () {
+                    console.log('deleted');
+                    location.reload();
+                    // redrawTable();
+                },
+                error: function (data) {
+                    console.log(data);
+                    if (data.status == 403) {
+                        alert('403 status code! User error');
+                    }
+                    if (data.status == 500) {
+                        alert('You cant delete this publication because' +
+                            ' it is ordered');
+                    }
+                }
+            })
+        })
+    }
+
+    function isNumber(n) {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+
+
+    function actionsOnSelectChange(select, childSelect) {
+        select.change(function () {
+            const id = select.val();
+            childSelect.find('option').remove();
+            $.ajax({
+                url: `${API_URL}/subcategory/category?id=${id}`,
+                type: 'get',
+                success: function (response) {
+                    childSelect.append(`<option value="0" disabled selected>Subcategory</option>`);
+                    for (const subcategory of response) {
+                        childSelect.append(`<option value="${subcategory.id}">${subcategory.name}</option>`);
+                    }
+                }
+            });
+        });
+    }
+
+    function appendCategoriesToSelect(selector) {
+        $.ajax({
+            url: `${API_URL}/category`,
+            type: 'get',
+            success: function (response) {
+                for (const category of response) {
+                    selector.append(`<option value="${category.id}">${category.name}</option>`)
+                }
+            }
+        });
+    }
+
+    function appendTypesToSelect(selector) {
+        $.ajax({
+            url: `${API_URL}/type`,
+            type: 'get',
+            success: function (response) {
+                for (const type of response) {
+                    selector.append(`<option value="${type.id}">${type.name}</option>`)
+                }
+            }
+        });
+    }
+
+    function appendDeliveriesToSelect(selector) {
+        $.ajax({
+            url: `${API_URL}/delivery`,
+            type: 'get',
+            success: function (response) {
+                for (const delivery of response) {
+                    selector.append(`<option value="${delivery.id}">${delivery.name}</option>`)
+                }
+            }
+        });
+    }
+
+    const getBase64FromFile = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    };
+
+</script>
+</html>
