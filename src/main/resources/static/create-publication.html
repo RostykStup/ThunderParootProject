@@ -10,12 +10,12 @@
 <link rel="stylesheet" href="css/create-publication.css">
 <script src='https://kit.fontawesome.com/a076d05399.js'></script>
 <style>
-    .image-in-container{
-        height:100%;
+    .image-in-container {
+        height: 100%;
 
     }
 
-    .image-container{
+    .image-container {
         height: 100px;
         width: 100px;
     }
@@ -29,7 +29,8 @@
             </a>
         </li>
         <li class="navigation-item" style="margin-left: 10px">
-            <div id="search-div"><i class="fa fa-search"></i><input class="search-input" id="search-input" type="text" placeholder="What are you looking for?"></div>
+            <div id="search-div"><i class="fa fa-search"></i><input class="search-input" id="search-input" type="text"
+                                                                    placeholder="What are you looking for?"></div>
         </li>
         <li class="navigation-item">
             <a class="navigation-link" href="create-publication.html">Create publication</a>
@@ -67,9 +68,11 @@
         <div id="main-info-container">
             <div class="input-div"><input id="publication-name-input" type="text" placeholder="Name"></div>
             <div class="input-div"><input id="publication-price-input" min="0" type="number" placeholder="Price"></div>
-            <div class="input-div"><input id="publication-count-input" min="1" max="2000000000" type="number" placeholder="Number of product"></div>
-            <div class="input-div"><textarea id="publication-description-input" type="text" cols="30" rows="10" style="resize: none"
-                      placeholder="Description"></textarea></div>
+            <div class="input-div"><input id="publication-count-input" min="1" max="2000000000" type="number"
+                                          placeholder="Number of product"></div>
+            <div class="input-div"><textarea id="publication-description-input" type="text" cols="30" rows="10"
+                                             style="resize: none"
+                                             placeholder="Description"></textarea></div>
         </div>
         <div id="select-info-container">
             <select id="category-select">
@@ -136,10 +139,10 @@
         }
     }
 
-    publicationImageInput.change(function() {
+    publicationImageInput.change(function () {
         $('#images-container').html('');
         let length = publicationImageInput[0].files.length;
-        if (parseInt(length) > 5){
+        if (parseInt(length) > 5) {
             alert("You can only upload a maximum of 5 files");
             publicationImageInput.val('');
         } else readURL(this);
@@ -165,39 +168,65 @@
 
         };
         if (isNumber(request.count) && isNumber(request.price) &&
-        request.name !=='' && request.typeId!==0 && request.deliveryId !== 0 && request.subcategoryId !== 0) {
-            $('.image-in-container').each((i, e) => {
-                getBase64FromFile(publicationImageInput[0].files[i])
-                    .then(image => {
-                        publicationImages.push(image);
-                        if (i === (publicationImageInput[0].files.length - 1)) {
-                            request.images = publicationImages;
-                            $.ajax({
-                                url: `${API_URL}/publication`,
-                                contentType: 'application/json',
-                                headers: {
-                                    "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
-                                },
-                                type: 'post',
-                                data: JSON.stringify(request),
-                                success: function () {
-                                    console.log('ok');
-                                    window.location.href = 'my-publications.html'
-                                    publicationImageInput.val('');
-                                    $('#images-container').html('');
-                                    publicationDescriptionInput.val('');
-                                    publicationPriceInput.val('');
-                                    publicationNameInput.val('');
-                                    categorySelect.val('0');
-                                    subcategorySelect.val('0');
-                                    deliverySelect.val('0');
-                                    typeSelect.val('0');
-                                },
-                            })
-                        }
-                    })
-                    .catch(() => alert("Something went wrong, try again"))
-            });
+            request.name !== '' && request.typeId !== 0 && request.deliveryId !== 0 && request.subcategoryId !== 0) {
+            if (publicationImageInput[0].files.length === 0) {
+                $.ajax({
+                    url: `${API_URL}/publication`,
+                    contentType: 'application/json',
+                    headers: {
+                        "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                    },
+                    type: 'post',
+                    data: JSON.stringify(request),
+                    success: function () {
+                        console.log('ok');
+                        window.location.href = 'my-publications.html'
+                        publicationImageInput.val('');
+                        $('#images-container').html('');
+                        publicationDescriptionInput.val('');
+                        publicationPriceInput.val('');
+                        publicationNameInput.val('');
+                        categorySelect.val('0');
+                        subcategorySelect.val('0');
+                        deliverySelect.val('0');
+                        typeSelect.val('0');
+                    },
+                })
+            } else {
+                $('.image-in-container').each((i, e) => {
+                    getBase64FromFile(publicationImageInput[0].files[i])
+                        .then(image => {
+                            publicationImages.push(image);
+                            if (i === (publicationImageInput[0].files.length - 1)) {
+                                request.images = publicationImages;
+                                $.ajax({
+                                    url: `${API_URL}/publication`,
+                                    contentType: 'application/json',
+                                    headers: {
+                                        "Authorization": `Bearer ${window.localStorage.getItem('userToken')}`
+                                    },
+                                    type: 'post',
+                                    data: JSON.stringify(request),
+                                    success: function () {
+                                        console.log('ok');
+                                        window.location.href = 'my-publications.html'
+                                        publicationImageInput.val('');
+                                        $('#images-container').html('');
+                                        publicationDescriptionInput.val('');
+                                        publicationPriceInput.val('');
+                                        publicationNameInput.val('');
+                                        categorySelect.val('0');
+                                        subcategorySelect.val('0');
+                                        deliverySelect.val('0');
+                                        typeSelect.val('0');
+                                    },
+                                })
+                            }
+                        })
+                        .catch(() => alert("Something went wrong, try again"))
+                });
+            }
+
         } else alert('Price and count inputs must be numbers and all field must be filled');
     });
 
