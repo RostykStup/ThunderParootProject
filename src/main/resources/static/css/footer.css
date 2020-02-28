@@ -1,0 +1,11 @@
+#footer {
+    /*display: fix;*/
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    /*background-color: red;*/
+    color: #777777;
+    font-size: 14px;
+    text-align: center;
+}
